@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Выше облаков — справочник гор для восхождений</title>
+<meta name="description" content="Выше облаков — справочник о самых высоких и популярных горах мира: высота, сложность маршрута, первовосходители и ключевые события.">
+
+<!-- Шрифт Manrope (единственная внешняя зависимость) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   1. ПЕРЕМЕННЫЕ И БАЗОВЫЕ СТИЛИ
+   ============================================================ */
+:root{
+  /* — Основная палитра — */
+  --color-deep:#0B1E3F;        /* глубокий синий */
+  --color-deep-2:#16305e;      /* синий посветлее (панели) */
+  --color-ice:#E6F0FA;         /* ледяной */
+  --color-accent:#FF7A45;      /* закатный оранжевый */
+  --color-accent-soft:#ff9a70;
+  --color-white:#ffffff;
+  --color-text:#12233f;
+  --color-muted:#5a6b85;
+  --color-border:#d8e3f1;
+  --color-footer:#08152c;
+
+  /* — Бейджи сложности (контраст с белым ≥ 4.5:1) — */
+  --badge-easy:#1e7a4f;
+  --badge-medium:#9a6a00;
+  --badge-hard:#b3491b;
+  --badge-extreme:#b32020;
+
+  /* — Геометрия — */
+  --radius-md:12px;
+  --radius-lg:16px;
+  --radius-pill:999px;
+
+  /* — Тени — */
+  --shadow-sm:0 2px 8px rgba(11,30,63,.06);
+  --shadow-md:0 10px 26px rgba(11,30,63,.10);
+  --shadow-lg:0 20px 44px rgba(11,30,63,.18);
+
+  /* — Ритм и сетка — */
+  --section-pad:clamp(3.5rem, 8vw, 7rem);
+  --container:1200px;
+  --transition:.3s ease;
+}
+
+*,
+*::before,
+*::after{ box-sizing:border-box; }
+
+html{
+  scroll-behavior:smooth;
+  scroll-padding-top:5.5rem;      /* отступ под липкую шапку */
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  margin:0;
+  font-family:'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size:1rem;
+  line-height:1.65;
+  color:var(--color-text);
+  background:var(--color-white);
+}
+
+h1, h2, h3, p, ul, ol, figure{ margin:0; }
+ul, ol{ padding:0; list-style:none; }
+img, svg{ display:block; max-width:100%; }
+button{ font:inherit; color:inherit; }
+a{ color:inherit; }
+
+/* Видимый фокус только при клавиатурной навигации */
+:focus-visible{
+  outline:3px solid var(--color-accent);
+  outline-offset:3px;
+  border-radius:6px;
+}
+
+/* Утилита-контейнер */
+.container{
+  width:100%;
+  max-width:var(--container);
+  margin-inline:auto;
+  padding-inline:clamp(1rem, 4vw, 2rem);
+}
+
+/* ============================================================
+   2. ШАПКА И НАВИГАЦИЯ
+   ============================================================ */
+.header{
+  position:sticky;
+  top:0;
+  z-index:60;
+  background:rgba(11,30,63,.94);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.header__inner{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  min-height:64px;
+}
+
+/* Логотип */
+.logo{
+  display:inline-flex;
+  align-items:center;
+  gap:.55rem;
+  padding:.4rem 0;
+  color:#fff;
+  text-decoration:none;
+  font-weight:800;
+  font-size:1.05rem;
+  letter-spacing:.01em;
+}
+.logo__icon{
+  width:26px;
+  height:26px;
+  flex:0 0 auto;
+  color:var(--color-accent);
+}
+.logo:hover .logo__icon{ transform:translateY(-2px); }
+.logo__icon{ transition:transform var(--transition); }
+
+/* Бургер (только мобильные) */
+.burger{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  width:44px;
+  height:44px;
+  padding:0;
+  background:transparent;
+  border:0;
+  border-radius:10px;
+  cursor:pointer;
+  transition:background var(--transition);
+}
+.burger:hover{ background:rgba(255,255,255,.1); }
+.burger__line{
+  width:20px;
+  height:2px;
+  background:#fff;
+  border-radius:2px;
+  transition:transform var(--transition), opacity var(--transition);
+}
+.burger.is-active .burger__line:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.burger.is-active .burger__line:nth-child(2){ opacity:0; }
+.burger.is-active .burger__line:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+/* Меню — мобильная версия (выпадающая панель) */
+.nav{
+  position:absolute;
+  top:calc(100% + .5rem);
+  left:clamp(1rem, 4vw, 2rem);
+  right:clamp(1rem, 4vw, 2rem);
+  display:none;
+  padding:.5rem;
+  background:var(--color-deep-2);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-lg);
+}
+.nav.is-open{ display:block; }
+.nav__list{
+  display:flex;
+  flex-direction:column;
+  gap:.15rem;
+}
+.nav__link{
+  display:block;
+  padding:.75rem 1rem;
+  border-radius:10px;
+  color:#dbe7f7;
+  text-decoration:none;
+  font-weight:600;
+  font-size:.98rem;
+  transition:background var(--transition), color var(--transition);
+}
+.nav__link:hover{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+}
+
+/* Меню — планшет и десктоп */
+@media (min-width:820px){
+  .burger{ display:none; }
+  .nav{
+    position:static;
+    display:block;
+    left:auto;
+    right:auto;
+    padding:0;
+    background:none;
+    border:0;
+    box-shadow:none;
+  }
+  .nav__list{
+    flex-direction:row;
+    gap:.25rem;
+  }
+  .nav__link{ padding:.55rem .9rem; }
+}
+
+/* ============================================================
+   3. HERO-СЕКЦИЯ
+   ============================================================ */
+.hero{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height:88vh;
+  color:#fff;
+  background:linear-gradient(
+    180deg,
+    #0B1E3F 0%,
+    #1b3f74 28%,
+    #4f83bd 56%,
+    #a9cbe9 80%,
+    #E6F0FA 100%
+  );
+}
+
+/* Закатное свечение */
+.hero__glow{
+  position:absolute;
+  top:8%;
+  right:-6%;
+  z-index:0;
+  width:min(460px, 72vw);
+  aspect-ratio:1;
+  border-radius:50%;
+  background:radial-gradient(circle,
+      rgba(255,122,69,.55) 0%,
+      rgba(255,122,69,.18) 45%,
+      rgba(255,122,69,0) 72%);
+  pointer-events:none;
+}
+
+.hero__inner{
+  position:relative;
+  z-index:2;
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:1.1rem;
+  padding-top:clamp(3rem, 9vw, 6rem);
+  padding-bottom:clamp(2.5rem, 6vw, 4rem);
+}
+
+.hero__eyebrow{
+  font-size:.78rem;
+  font-weight:700;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--color-accent-soft);
+}
+
+.hero__title{
+  max-width:16ch;
+  font-size:clamp(2.1rem, 6.2vw, 4rem);
+  font-weight:800;
+  line-height:1.06;
+  letter-spacing:-.02em;
+}
+
+.hero__text{
+  max-width:56ch;
+  font-size:clamp(1rem, 1.6vw, 1.15rem);
+  color:rgba(255,255,255,.86);
+}
+
+.hero__actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.75rem;
+  margin-top:.6rem;
+}
+
+/* Силуэт гор — SVG в потоке, прижат к низу секции */
+.hero__mountains{
+  position:relative;
+  z-index:1;
+  margin-top:auto;
+  line-height:0;
+  will-change:transform;
+}
+.hero__mountains svg{
+  width:100%;
+  height:clamp(120px, 18vw, 230px);
+}
+
+/* ============================================================
+   4. КНОПКИ
+   ============================================================ */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  min-height:48px;
+  padding:.8rem 1.65rem;
+  border:1px solid transparent;
+  border-radius:var(--radius-pill);
+  font-size:1rem;
+  font-weight:700;
+  line-height:1;
+  text-decoration:none;
+  cursor:pointer;
+  transition:transform var(--transition),
+             background var(--transition),
+             color var(--transition),
+             border-color var(--transition),
+             box-shadow var(--transition);
+}
+.btn--accent{
+  background:var(--color-accent);
+  color:#2a1108;
+  box-shadow:0 8px 22px rgba(255,122,69,.32);
+}
+.btn--accent:hover{
+  background:var(--color-accent-soft);
+  transform:translateY(-2px);
+  box-shadow:0 14px 30px rgba(255,122,69,.42);
+}
+.btn--ghost{
+  background:transparent;
+  border-color:rgba(11,30,63,.35);
+  color:var(--color-deep);
+}
+.btn--ghost:hover{
+  background:var(--color-deep);
+  border-color:var(--color-deep);
+  color:#fff;
+  transform:translateY(-2px);
+}
+
+/* ============================================================
+   5. ОБЩИЕ СЕКЦИИ
+   ============================================================ */
+.section{ padding:var(--section-pad) 0; }
+.section--ice{ background:var(--color-ice); }
+
+.section__title{
+  font-size:clamp(1.65rem, 3.6vw, 2.5rem);
+  font-weight:800;
+  line-height:1.15;
+  letter-spacing:-.015em;
+}
+.section__subtitle{
+  max-width:62ch;
+  margin-top:.75rem;
+  font-size:1.02rem;
+  color:var(--color-muted);
+}
+
+/* ============================================================
+   6. СЕКЦИЯ ФИЛЬТРОВ
+   ============================================================ */
+.filters__groups{
+  display:flex;
+  flex-direction:column;
+  gap:1.4rem;
+  margin-top:2.2rem;
+}
+
+.filter-group{
+  display:flex;
+  flex-direction:column;
+  gap:.6rem;
+}
+
+.filter-group__title{
+  font-size:.78rem;
+  font-weight:700;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--color-muted);
+}
+
+/* На мобильных «пилюли» прокручиваются по горизонтали */
+.filter-group__pills{
+  display:flex;
+  gap:.5rem;
+  overflow-x:auto;
+  padding-bottom:.35rem;
+  scrollbar-width:thin;
+}
+
+.pill{
+  flex:0 0 auto;
+  min-height:44px;
+  padding:.5rem 1.1rem;
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-pill);
+  background:#fff;
+  color:var(--color-text);
+  font-size:.9rem;
+  font-weight:600;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:background var(--transition),
+             color var(--transition),
+             border-color var(--transition),
+             transform var(--transition);
+}
+.pill:hover{
+  border-color:var(--color-accent);
+  color:#a8431b;
+  transform:translateY(-1px);
+}
+.pill.is-active{
+  background:var(--color-deep);
+  border-color:var(--color-deep);
+  color:#fff;
+}
+.pill.is-active:hover{ color:#fff; }
+
+@media (min-width:900px){
+  .filter-group__pills{
+    flex-wrap:wrap;
+    overflow:visible;
+    padding-bottom:0;
+  }
+}
+
+.filters__footer{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  margin-top:2rem;
+  padding-top:1.5rem;
+  border-top:1px solid rgba(11,30,63,.1);
+}
+.filters__count{
+  font-weight:700;
+  color:var(--color-deep);
+}
+
+/* ============================================================
+   7. КАТАЛОГ ГОР
+   ============================================================ */
+.catalog__grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  gap:1.35rem;
+  margin-top:2.4rem;
+}
+
+/* Карточка */
+.mountain-card{
+  display:flex;
+  flex-direction:column;
+  gap:.85rem;
+  padding:1.5rem;
+  background:#fff;
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+  transition:transform var(--transition),
+             box-shadow var(--transition),
+             border-color var(--transition);
+}
+.mountain-card:hover{
+  transform:translateY(-6px);
+  box-shadow:var(--shadow-lg);
+  border-color:#c3d6ec;
+}
+/* Атрибут hidden должен побеждать display:flex */
+.mountain-card[hidden]{ display:none; }
+
+.mountain-card__header{ display:block; }
+
+/* Фото вершины */
+.mountain-card__media{
+  position:relative;
+  overflow:hidden;
+  aspect-ratio:16/10;
+  border-radius:var(--radius-md);
+  background:linear-gradient(135deg, var(--color-deep-2), #2c5488);
+}
+.mountain-card__media img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .5s ease;
+}
+.mountain-card:hover .mountain-card__media img{ transform:scale(1.06); }
+
+.mountain-card__title{
+  font-size:1.2rem;
+  font-weight:800;
+  line-height:1.25;
+  letter-spacing:-.01em;
+}
+
+.mountain-card__location{
+  margin-top:.3rem;
+  font-size:.9rem;
+  color:var(--color-muted);
+}
+
+.mountain-card__stats{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.75rem;
+}
+
+.mountain-card__height{
+  font-size:1.3rem;
+  font-weight:800;
+  color:var(--color-deep);
+  white-space:nowrap;
+}
+
+.mountain-card__desc{
+  font-size:.95rem;
+  color:#3d4f6b;
+}
+
+/* Бейдж сложности */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:.3rem .7rem;
+  border-radius:var(--radius-pill);
+  font-size:.7rem;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:#fff;
+  white-space:nowrap;
+}
+.badge--easy{ background:var(--badge-easy); }
+.badge--medium{ background:var(--badge-medium); }
+.badge--hard{ background:var(--badge-hard); }
+.badge--extreme{ background:var(--badge-extreme); }
+
+/* Аккордеон «Подробнее» */
+.mountain-card__details{
+  margin-top:auto;
+  padding-top:.9rem;
+  border-top:1px solid var(--color-border);
+}
+
+.mountain-card__summary{
+  display:inline-flex;
+  align-items:center;
+  gap:.55rem;
+  min-height:44px;
+  padding:.25rem 0;
+  color:var(--color-deep);
+  font-weight:700;
+  font-size:.95rem;
+  list-style:none;
+  cursor:pointer;
+  transition:color var(--transition);
+}
+.mountain-card__summary::-webkit-details-marker{ display:none; }
+.mountain-card__summary::after{
+  content:'';
+  width:8px;
+  height:8px;
+  border-right:2px solid currentColor;
+  border-bottom:2px solid currentColor;
+  transform:rotate(45deg) translateY(-2px);
+  transition:transform var(--transition);
+}
+.mountain-card__summary:hover{ color:#a8431b; }
+.mountain-card__details[open] .mountain-card__summary::after{
+  transform:rotate(-135deg) translateY(-2px);
+}
+
+.mountain-card__body{
+  margin-top:.6rem;
+  font-size:.9rem;
+  color:var(--color-muted);
+}
+.mountain-card__details[open] .mountain-card__body{
+  animation:fadeSlide .3s ease;
+}
+
+@keyframes fadeSlide{
+  from{ opacity:0; transform:translateY(-6px); }
+  to{ opacity:1; transform:none; }
+}
+
+/* Состояние «ничего не найдено» */
+.catalog__empty{
+  display:none;
+  padding:3rem 1rem;
+  text-align:center;
+  font-size:1.05rem;
+  color:var(--color-muted);
+}
+.catalog__empty.is-visible{ display:block; }
+
+/* ============================================================
+   8. СЕКЦИЯ «О ПРОЕКТЕ»
+   ============================================================ */
+.about{
+  background:var(--color-deep);
+  color:#fff;
+}
+.about__lead{
+  max-width:70ch;
+  margin-top:1rem;
+  font-size:1.05rem;
+  color:rgba(255,255,255,.82);
+}
+.about__lead + .about__lead{ margin-top:.9rem; }
+
+.stats{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:1rem;
+  margin-top:2.5rem;
+}
+@media (min-width:640px){
+  .stats{ grid-template-columns:repeat(3, 1fr); }
+}
+
+.stats__item{
+  padding:1.5rem;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--radius-lg);
+  transition:background var(--transition), border-color var(--transition);
+}
+.stats__item:hover{
+  background:rgba(255,255,255,.1);
+  border-color:rgba(255,122,69,.5);
+}
+.stats__value{
+  display:block;
+  font-size:clamp(2rem, 4vw, 2.75rem);
+  font-weight:800;
+  line-height:1;
+  color:var(--color-accent);
+}
+.stats__label{
+  display:block;
+  margin-top:.5rem;
+  font-size:.95rem;
+  color:rgba(255,255,255,.78);
+}
+
+/* ============================================================
+   9. ФУТЕР
+   ============================================================ */
+.footer{
+  padding:2.75rem 0 2rem;
+  background:var(--color-footer);
+  color:#9fb4d1;
+  font-size:.92rem;
+}
+.footer__inner{
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+}
+.footer__top{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+}
+.footer__brand{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  color:#fff;
+  font-weight:800;
+}
+.footer__brand svg{
+  width:22px;
+  height:22px;
+  color:var(--color-accent);
+}
+.footer__links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem 1.25rem;
+}
+.footer__link{
+  color:#c7d7ec;
+  text-decoration:none;
+  transition:color var(--transition);
+}
+.footer__link:hover{
+  color:var(--color-accent);
+  text-decoration:underline;
+}
+.footer__bottom{
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+  padding-top:1.25rem;
+  border-top:1px solid rgba(255,255,255,.1);
+}
+
+/* ============================================================
+   10. ДОСТУПНОСТЬ: УМЕНЬШЕННАЯ АНИМАЦИЯ
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     ШАПКА
+     ============================================================ -->
+<header class="header">
+  <div class="container header__inner">
+
+    <a class="logo" href="#hero" aria-label="Выше облаков — на главную">
+      <svg class="logo__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+           role="img" aria-label="Иконка горы">
+        <path d="M2 19h20L14.5 6 11 12l-2-3-7 10Z"/>
+        <path d="M12.4 9.6 14.5 6"/>
+      </svg>
+      <span>Выше облаков</span>
+    </a>
+
+    <button class="burger" id="burger" type="button"
+            aria-label="Открыть меню" aria-expanded="false" aria-controls="primary-nav">
+      <span class="burger__line" aria-hidden="true"></span>
+      <span class="burger__line" aria-hidden="true"></span>
+      <span class="burger__line" aria-hidden="true"></span>
+    </button>
+
+    <nav class="nav" id="primary-nav" aria-label="Основная навигация">
+      <ul class="nav__list">
+        <li><a class="nav__link" href="#catalog">Горы</a></li>
+        <li><a class="nav__link" href="#filter">Фильтр</a></li>
+        <li><a class="nav__link" href="#about">О проекте</a></li>
+      </ul>
+    </nav>
+
+  </div>
+</header>
+
+<main>
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section class="hero" id="hero">
+    <div class="hero__glow" aria-hidden="true"></div>
+
+    <div class="container hero__inner">
+      <p class="hero__eyebrow">Справочник вершин</p>
+      <h1 class="hero__title">Покори вершины, о которых говорят легенды</h1>
+      <p class="hero__text">
+        «Выше облаков» — краткий и честный справочник о высочайших и самых известных
+        горах планеты: высота, сложность маршрута, первовосходители и ключевые события.
+      </p>
+      <div class="hero__actions">
+        <a class="btn btn--accent" href="#catalog">Смотреть горы</a>
+        <a class="btn btn--ghost" href="#filter"
+           style="color:#fff;border-color:rgba(255,255,255,.45);">Подобрать по фильтру</a>
+      </div>
+    </div>
+
+    <!-- CSS/SVG-имитация силуэта гор -->
+    <div class="hero__mountains" id="hero-mountains" aria-hidden="true">
+      <svg viewBox="0 0 1440 260" preserveAspectRatio="none" role="presentation">
+        <!-- Дальний хребет -->
+        <path d="M0 185 L95 118 L175 163 L285 92 L395 158 L505 98 L615 148 L735 78 L865 152 L985 102
+                 L1105 158 L1225 92 L1335 148 L1440 112 L1440 260 L0 260 Z"
+              fill="#2c5488" opacity=".45"/>
+        <!-- Средний хребет -->
+        <path d="M0 212 L140 146 L230 190 L360 116 L470 186 L600 130 L720 196 L860 126 L980 190
+                 L1120 136 L1250 196 L1380 146 L1440 180 L1440 260 L0 260 Z"
+              fill="#16305e" opacity=".72"/>
+        <!-- Передний хребет -->
+        <path d="M0 240 L120 170 L240 226 L380 150 L500 216 L640 166 L780 230 L920 160 L1060 220
+                 L1200 170 L1330 226 L1440 186 L1440 260 L0 260 Z"
+              fill="#0B1E3F" opacity=".93"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ФИЛЬТРЫ
+       ============================================================ -->
+  <section class="section section--ice" id="filter">
+    <div class="container">
+      <h2 class="section__title">Фильтр вершин</h2>
+      <p class="section__subtitle">
+        Выберите высоту, ранг сложности и часть света — карточки обновятся сразу,
+        без перезагрузки страницы.
+      </p>
+
+      <div class="filters__groups">
+
+        <!-- Высота -->
+        <div class="filter-group" data-filter-group="height" role="group" aria-labelledby="filter-height-title">
+          <span class="filter-group__title" id="filter-height-title">Высота</span>
+          <div class="filter-group__pills">
+            <button class="pill is-active" type="button" data-value="all" aria-pressed="true">Все</button>
+            <button class="pill" type="button" data-value="low" aria-pressed="false">до 5000 м</button>
+            <button class="pill" type="button" data-value="mid" aria-pressed="false">5000–7000 м</button>
+            <button class="pill" type="button" data-value="high" aria-pressed="false">выше 7000 м</button>
+          </div>
+        </div>
+
+        <!-- Сложность -->
+        <div class="filter-group" data-filter-group="difficulty" role="group" aria-labelledby="filter-difficulty-title">
+          <span class="filter-group__title" id="filter-difficulty-title">Сложность</span>
+          <div class="filter-group__pills">
+            <button class="pill is-active" type="button" data-value="all" aria-pressed="true">Все</button>
+            <button class="pill" type="button" data-value="easy" aria-pressed="false">Лёгкая</button>
+            <button class="pill" type="button" data-value="medium" aria-pressed="false">Средняя</button>
+            <button class="pill" type="button" data-value="hard" aria-pressed="false">Сложная</button>
+            <button class="pill" type="button" data-value="extreme" aria-pressed="false">Экстремальная</button>
+          </div>
+        </div>
+
+        <!-- Регион -->
+        <div class="filter-group" data-filter-group="region" role="group" aria-labelledby="filter-region-title">
+          <span class="filter-group__title" id="filter-region-title">Регион</span>
+          <div class="filter-group__pills">
+            <button class="pill is-active" type="button" data-value="all" aria-pressed="true">Все</button>
+            <button class="pill" type="button" data-value="asia" aria-pressed="false">Азия</button>
+            <button class="pill" type="button" data-value="europe" aria-pressed="false">Европа</button>
+            <button class="pill" type="button" data-value="america" aria-pressed="false">Америка</button>
+            <button class="pill" type="button" data-value="africa" aria-pressed="false">Африка</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="filters__footer">
+        <p class="filters__count" id="filter-count" role="status" aria-live="polite">
+          Показано 22 из 22
+        </p>
+        <button class="btn btn--ghost" id="reset-filters" type="button">Сбросить фильтры</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       КАТАЛОГ ГОР
+       ============================================================ -->
+  <section class="section" id="catalog">
+    <div class="container">
+      <h2 class="section__title">Каталог вершин</h2>
+      <p class="section__subtitle">
+        22 горы — от классических восьмитысячников Гималаев и Каракорума
+        до доступных вершин Кавказа, Альп и Крыма.
+      </p>
+
+      <div class="catalog__grid" id="catalog-grid">
+
+        <!-- 1. Эверест -->
+        <article class="mountain-card" data-height="8848" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Mt._Everest_from_Gokyo_Ri_November_5%2C_2012.jpg?width=600"
+                 alt="Эверест (Джомолунгма)" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Эверест (Джомолунгма)</h3>
+            <p class="mountain-card__location">Азия · Непал / Китай (Тибет)</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 848 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Высочайшая вершина Земли и главная цель мирового альпинизма.
+            Первое подтверждённое восхождение совершили Эдмунд Хиллари и Тенцинг Норгей в 1953 году.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Классические маршруты — Южное седло (со стороны Непала) и Северное седло
+                (со стороны Тибета). Ключевые сложности: высотная гипоксия, лавины в ледопаде
+                Кхумбу, экстремальный холод и ветер, а также очередь на «ступени Хиллари».
+              </p>
+              <p>
+                Среди известных событий — гибель Джорджа Мэллори и Эндрю Ирвайна в 1924 году,
+                лавина в ледопаде Кхумбу в 2014 году и лавина на базовый лагерь, вызванная
+                землетрясением 2015 года.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 2. К2 -->
+        <article class="mountain-card" data-height="8611" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Chogori.jpg?width=600"
+                 alt="К2 (Чогори)" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">К2 (Чогори)</h3>
+            <p class="mountain-card__location">Азия · Пакистан / Китай</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 611 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Вторая по высоте вершина мира и один из технически самых сложных восьмитысячников.
+            Первое восхождение — итальянская экспедиция 1954 года (Акилле Компаньони, Лино Лачеделли).
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Классика — маршрут по ребру Абруцци. Ключевой участок — «бутылочное горло»
+                под висячим ледником, где постоянно существует риск обрушения сераков.
+              </p>
+              <p>
+                К2 известна высокой исторической смертностью среди восходителей;
+                трагедия 2008 года на «бутылочном горле» унесла жизни одиннадцати человек.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 3. Канченджанга -->
+        <article class="mountain-card" data-height="8586" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Kangchenjunga_PangPema.JPG?width=600"
+                 alt="Канченджанга" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Канченджанга</h3>
+            <p class="mountain-card__location">Азия · Непал / Индия</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 586 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Третья вершина мира, массив из пяти вершин, главная из которых — самая высокая точка Индии.
+            Первое восхождение — 1955 год, Джордж Бэнд и Джо Браун.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Попытки восхождения предпринимались с 1905 года, но вершина оставалась
+                неприступной полвека. Причина — лавиноопасные склоны, частые снегопады
+                и крайне переменчивая погода.
+              </p>
+              <p>
+                Канченджанга долгое время считалась самым сложным и опасным из восьмитысячников
+                и до сих пор уступает по числу успешных восхождений Эвересту и К2.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 4. Лхоцзе -->
+        <article class="mountain-card" data-height="8516" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lhotse-fromChukhungRi.jpg?width=600"
+                 alt="Лхоцзе" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Лхоцзе</h3>
+            <p class="mountain-card__location">Азия · Непал / Китай (Тибет)</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 516 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Четвёртая вершина мира, соседка Эвереста: их разделяет Южное седло.
+            Первое восхождение — 1956 год, Эрнст Райсс и Фриц Лухзингер.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Главная вершина долго оставалась непокорённой, хотя маршрут проходит
+                через хорошо известный Западный цирк. Южная стена Лхоцзе — один из
+                сложнейших «стенных» маршрутов мира.
+              </p>
+              <p>
+                Восхождение часто рассматривают как альтернативу переполненному Эвересту,
+                однако оно требует более серьёзной технической подготовки.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 5. Макалу -->
+        <article class="mountain-card" data-height="8485" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Makalu.jpg?width=600"
+                 alt="Макалу" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Макалу</h3>
+            <p class="mountain-card__location">Азия · Непал / Китай (Тибет)</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 485 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Пятая вершина мира; название переводится как «Большая чёрная» —
+            из-за тёмных скальных стен. Первое восхождение — 1955 год,
+            французская экспедиция (Лионель Террэ, Жан Кузи).
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Характер вершины — острые гребни, крутые скально-ледовые стены
+                и сильные ветра. Классический маршрут идёт по Западному ребру.
+              </p>
+              <p>
+                Макалу считается одним из наименее посещаемых восьмитысячников:
+                число успешных восхождений здесь заметно ниже, чем у Эвереста или Чо-Ойю.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 6. Чо-Ойю -->
+        <article class="mountain-card" data-height="8188" data-difficulty="hard" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Chooyu.jpg?width=600"
+                 alt="Чо-Ойю" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Чо-Ойю</h3>
+            <p class="mountain-card__location">Азия · Непал / Китай (Тибет)</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 188 м</span>
+            <span class="badge badge--hard">Сложная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Шестая вершина мира, которую часто называют самым «доступным» восьмитысячником.
+            Первое восхождение — 1954 год, австрийская экспедиция
+            (Йозеф Йёхлер, Херберт Тихи, Пазанг Дава Лама).
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Маршрут с северной стороны (Тибет) технически относительно прост,
+                но требует полноценной акклиматизации и выносливости.
+              </p>
+              <p>
+                Именно Чо-Ойю многие альпинисты выбирают как первый восьмитысячник
+                перед более сложными вершинами.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 7. Дхаулагири -->
+        <article class="mountain-card" data-height="8167" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Dhaulagiri_-_view_from_aircraft.jpg?width=600"
+                 alt="Дхаулагири" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Дхаулагири</h3>
+            <p class="mountain-card__location">Азия · Непал</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 167 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            «Белая гора» — седьмая вершина мира. Первое восхождение — 1960 год,
+            швейцарско-непальская экспедиция (Курт Димбергер, Наванг Дордже и другие).
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Главные опасности — лавины на склонах массива и крайне переменчивая погода.
+                Исторически смертность на Дхаулагири — одна из самых высоких
+                среди всех восьмитысячников.
+              </p>
+              <p>
+                Из-за этого вершина пользуется репутацией «тихого» и недооценённого
+                испытания даже среди опытных гималайских альпинистов.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 8. Манаслу -->
+        <article class="mountain-card" data-height="8163" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Sunrise%2C_Manaslu.jpg?width=600"
+                 alt="Манаслу" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Манаслу</h3>
+            <p class="mountain-card__location">Азия · Непал</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 163 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Восьмая вершина мира; название переводится как «Гора духов».
+            Первое восхождение — 1956 год, японская экспедиция
+            (Тосио Иманиси и Гьялзен Норбу).
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Склоны Манаслу лавиноопасны, а маршруты требуют хорошей
+                технической подготовки и опыта высотных восхождений.
+              </p>
+              <p>
+                Известные события — сход лавины в районе базового лагеря в 1972 году
+                и лавина 2012 года, затронувшая лагерь на маршруте.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 9. Нангапарбат -->
+        <article class="mountain-card" data-height="8126" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Fairy_Meadows_and_the_view_of_Nanga_Parbat.jpg?width=600"
+                 alt="Нангапарбат" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Нангапарбат</h3>
+            <p class="mountain-card__location">Азия · Пакистан</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 126 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Девятая вершина мира, известная как «Гора-убийца».
+            Первое восхождение — 1953 год, Герман Буль совершил его практически в одиночку
+            и без кислорода.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Нангапарбат отличается огромным перепадом высот от основания до вершины
+                и считается одним из самых опасных восьмитысячников по статистике смертности.
+              </p>
+              <p>
+                Среди трагических страниц — экспедиция 1934 года под руководством Вилли Меркля
+                и гибель Гюнтера Месснера в 1970 году при спуске по стене Рупаль.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 10. Аннапурна I -->
+        <article class="mountain-card" data-height="8091" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/South_Face_of_Annapurna_I_%28Main%29.jpg?width=600"
+                 alt="Аннапурна I" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Аннапурна I</h3>
+            <p class="mountain-card__location">Азия · Непал</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 091 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Десятая по высоте вершина мира и первый покорённый восьмитысячник:
+            в 1950 году на вершину поднялись Морис Эрцог и Луи Лашеналь.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Южные склоны Аннапурны крайне лавиноопасны, а погода меняется стремительно.
+                По исторической смертности среди восходителей вершина входит в число
+                самых опасных восьмитысячников.
+              </p>
+              <p>
+                В 1997 году на Аннапурне погиб известный альпинист Анатолий Букреев.
+                Отдельно известен циклон 2014 года, вызвавший сильные снегопады
+                на популярной треккинговой тропе вокруг массива.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 11. Шишабангма -->
+        <article class="mountain-card" data-height="8027" data-difficulty="hard" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/8%2C013m_Shishapangma_Tibet_China_%E8%A5%BF%E8%97%8F_%E5%B8%8C%E5%A4%8F%E9%82%A6%E9%A9%AC%E5%B3%B0_-_panoramio.jpg?width=600"
+                 alt="Шишабангма" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Шишабангма</h3>
+            <p class="mountain-card__location">Азия · Китай (Тибет)</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 027 м</span>
+            <span class="badge badge--hard">Сложная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Четырнадцатая по высоте вершина мира и последний покорённый восьмитысячник:
+            восхождение состоялось лишь в 1964 году в рамках китайской экспедиции.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Вершина целиком расположена в Тибете, классический маршрут идёт
+                по Северо-восточному гребню.
+              </p>
+              <p>
+                Долгое время район был закрыт для иностранных экспедиций,
+                поэтому по числу восхождений Шишабангма заметно уступает
+                другим восьмитысячникам.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 12. Гашербрум I -->
+        <article class="mountain-card" data-height="8080" data-difficulty="extreme" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/HiddenPeak.jpg?width=600"
+                 alt="Гашербрум I (Хидден-Пик)" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Гашербрум I (Хидден-Пик)</h3>
+            <p class="mountain-card__location">Азия · Пакистан / Китай</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 080 м</span>
+            <span class="badge badge--extreme">Экстремальная</span>
+          </p>
+          <p class="mountain-card__desc">
+            «Скрытая вершина» — одиннадцатая по высоте гора мира.
+            Первое восхождение — 1958 год, Пит Шёнинг и Эндрю Кауфман.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Название «Хидден-Пик» вершина получила потому, что долго оставалась
+                невидимой с основных подступов. Классический маршрут проходит
+                по северо-западному ребру.
+              </p>
+              <p>
+                Ключевые сложности — глубокий снег, лавины и технически непростые
+                ледовые участки. Массив Гашербрум включает несколько восьмитысячников,
+                что делает район популярным у опытных экспедиций.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 13. Броуд-Пик -->
+        <article class="mountain-card" data-height="8051" data-difficulty="hard" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/7_15_BroadPeak.jpg?width=600"
+                 alt="Броуд-Пик" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Броуд-Пик</h3>
+            <p class="mountain-card__location">Азия · Пакистан / Китай</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">8 051 м</span>
+            <span class="badge badge--hard">Сложная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Двенадцатая по высоте вершина мира, название которой переводится
+            как «широкая вершина». Первое восхождение — 1957 год,
+            австрийская экспедиция (Фриц Винтерштеллер, Маркус Шмук,
+            Курт Димбергер, Герман Буль).
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Маршрут по западному гребню считается технически относительно простым
+                для восьмитысячника, но требует серьёзной акклиматизации.
+              </p>
+              <p>
+                Главные сложности — большая высота, сильный ветер и длительные
+                переходы по открытому склону без укрытий.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 14. Монблан -->
+        <article class="mountain-card" data-height="4808" data-difficulty="medium" data-region="europe">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Mont_Blanc_Aiguille.jpg?width=600"
+                 alt="Монблан" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Монблан</h3>
+            <p class="mountain-card__location">Европа · Франция / Италия</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">4 808 м</span>
+            <span class="badge badge--medium">Средняя</span>
+          </p>
+          <p class="mountain-card__desc">
+            Высочайшая вершина Западной Европы и символ рождения альпинизма.
+            Первое восхождение — 1786 год, Жак Бальма и Мишель Паккар.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Популярные маршруты — «Гуте» (Goûter) и траверс «Три Монблана».
+                Основные опасности: трещины на леднике, камнепады и лавины.
+              </p>
+              <p>
+                Несмотря на кажущуюся доступность, Монблан ежегодно требует
+                спасательных операций: погода на массиве меняется очень быстро.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 15. Маттерхорн -->
+        <article class="mountain-card" data-height="4478" data-difficulty="hard" data-region="europe">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Matterhorn_from_Domh%C3%BCtte_-_2.jpg?width=600"
+                 alt="Маттерхорн" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Маттерхорн</h3>
+            <p class="mountain-card__location">Европа · Швейцария / Италия</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">4 478 м</span>
+            <span class="badge badge--hard">Сложная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Одна из самых узнаваемых вершин мира благодаря почти идеальной
+            пирамидальной форме. Первое восхождение — 1865 год, Эдвард Уимпер;
+            при спуске погибли четыре участника экспедиции.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Классические маршруты — гребень Хёрнли (со стороны Швейцарии)
+                и ребро Кьян (со стороны Италии).
+              </p>
+              <p>
+                Главная объективная опасность — камнепады на разогретых солнцем склонах.
+                Восхождение 1865 года считается одним из ключевых событий
+                «золотого века альпинизма».
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 16. Эльбрус -->
+        <article class="mountain-card" data-height="5642" data-difficulty="medium" data-region="europe">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Mount_Elbrus_%28cropped%29.jpg?width=600"
+                 alt="Эльбрус" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Эльбрус</h3>
+            <p class="mountain-card__location">Европа · Россия (Кавказ)</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">5 642 м</span>
+            <span class="badge badge--medium">Средняя</span>
+          </p>
+          <p class="mountain-card__desc">
+            Высочайшая вершина Европы, двуглавый потухший вулкан.
+            Первое восхождение на восточную вершину — 1829 год, экспедиция
+            под руководством генерала Георгия Эммануэля, в составе которой
+            был проводник Хилар Хачиров.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Маршрут с юга технически несложен, но большая высота и резкая смена
+                погоды требуют акклиматизации. До высоты около 3 847 м поднимается
+                канатная дорога, что делает вершину одной из самых посещаемых в России.
+              </p>
+              <p>
+                Основные риски — переохлаждение, потеря ориентации в тумане
+                и срыв на ледовых участках при сильном ветре.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 17. Казбек -->
+        <article class="mountain-card" data-height="5033" data-difficulty="medium" data-region="europe">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/%D0%93%D0%BE%D1%80%D0%B0_%D0%9A%D0%B0%D0%B7%D0%B1%D0%B5%D0%BA%2C_%D0%93%D1%80%D1%83%D0%B7%D0%B8%D1%8F.jpg?width=600"
+                 alt="Казбек" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Казбек</h3>
+            <p class="mountain-card__location">Европа · Грузия / Россия</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">5 033 м</span>
+            <span class="badge badge--medium">Средняя</span>
+          </p>
+          <p class="mountain-card__desc">
+            Потухший стратовулкан на Главном Кавказском хребте.
+            Первое восхождение — 1868 год, Дуглас Фрешфилд, Адольфус Мур,
+            Чарльз Такер с проводниками.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Популярный маршрут идёт с юга, от станции «Метеостанция»,
+                и включает ночной выход и длинный подъём по леднику.
+              </p>
+              <p>
+                Основные опасности — трещины, камнепады и быстрая смена погоды.
+                Вершина считается хорошей «учебной» пятитысячной горой.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 18. Аконкагуа -->
+        <article class="mountain-card" data-height="6961" data-difficulty="medium" data-region="america">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Aconcagua2016.jpg?width=600"
+                 alt="Аконкагуа" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Аконкагуа</h3>
+            <p class="mountain-card__location">Америка · Аргентина</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">6 961 м</span>
+            <span class="badge badge--medium">Средняя</span>
+          </p>
+          <p class="mountain-card__desc">
+            Высочайшая вершина Южной и всей Америки, одна из «Семи вершин».
+            Первое восхождение — 1897 год, Маттиас Цурбригген.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Классический маршрут начинается от «Пласа де Мулас» и проходит
+                через несколько промежуточных лагерей. Технически несложен,
+                но требует выносливости и хорошей акклиматизации.
+              </p>
+              <p>
+                Главные сложности — большая высота, сильный ветер и низкие температуры
+                даже в летний сезон Южного полушария.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 19. Денали -->
+        <article class="mountain-card" data-height="6190" data-difficulty="hard" data-region="america">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Wonder_Lake_and_Denali.jpg?width=600"
+                 alt="Денали (Мак-Кинли)" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Денали (Мак-Кинли)</h3>
+            <p class="mountain-card__location">Америка · США (Аляска)</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">6 190 м</span>
+            <span class="badge badge--hard">Сложная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Высочайшая вершина Северной Америки. Первое восхождение — 1913 год,
+            экспедиция под руководством Хадсона Стака.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Суровый арктический климат, длинные подходы и автономность делают
+                Денали серьёзным испытанием. Из-за высоких широт высота ощущается
+                тяжелее, чем на Кавказе или в Андах при тех же значениях.
+              </p>
+              <p>
+                Классический маршрут — West Buttress. На вершине фиксируются
+                одни из самых низких температур среди всех гор планеты.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 20. Килиманджаро -->
+        <article class="mountain-card" data-height="5895" data-difficulty="easy" data-region="africa">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Kilimanjaro_from_Amboseli.jpg?width=600"
+                 alt="Килиманджаро" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Килиманджаро</h3>
+            <p class="mountain-card__location">Африка · Танзания</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">5 895 м</span>
+            <span class="badge badge--easy">Лёгкая</span>
+          </p>
+          <p class="mountain-card__desc">
+            Высочайшая вершина Африки, потухший вулкан с ледником на вершине.
+            Первое восхождение — 1889 год, Ханс Майер и Людвиг Пуртшеллер.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Популярные маршруты — Мачаме, Лемошо и Умбве. Технически восхождение
+                не требует специального снаряжения, кроме треккинговой экипировки.
+              </p>
+              <p>
+                Главная сложность — быстрый набор высоты и риск горной болезни.
+                Килиманджаро входит в программу «Семь вершин» и остаётся
+                одной из самых доступных высоких гор мира.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 21. Аю-Даг -->
+        <article class="mountain-card" data-height="577" data-difficulty="easy" data-region="europe">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Artek001.jpg?width=600"
+                 alt="Аю-Даг" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Аю-Даг</h3>
+            <p class="mountain-card__location">Европа · Крым</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">577 м</span>
+            <span class="badge badge--easy">Лёгкая</span>
+          </p>
+          <p class="mountain-card__desc">
+            «Медведь-гора» на Южном берегу Крыма, популярное место пеших прогулок
+            и один из самых узнаваемых ландшафтов полуострова.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Аю-Даг — лакколит, «несостоявшийся вулкан»: магма не вышла на поверхность,
+                а застыла в толще пород, что и придало горе характерную куполообразную форму.
+              </p>
+              <p>
+                На склонах сохранились реликтовые рощи и археологические памятники.
+                Маршруты по гребню доступны без специальной подготовки,
+                однако требуют уважения к заповедному режиму территории.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <!-- 22. Белуха -->
+        <article class="mountain-card" data-height="4506" data-difficulty="hard" data-region="asia">
+          <figure class="mountain-card__media">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/2006-07_altaj_belucha.jpg?width=600"
+                 alt="Белуха" loading="lazy" decoding="async" width="600" height="375">
+          </figure>
+          <header class="mountain-card__header">
+            <h3 class="mountain-card__title">Белуха</h3>
+            <p class="mountain-card__location">Азия · Россия (Алтай)</p>
+          </header>
+          <p class="mountain-card__stats">
+            <span class="mountain-card__height">4 506 м</span>
+            <span class="badge badge--hard">Сложная</span>
+          </p>
+          <p class="mountain-card__desc">
+            Высочайшая вершина Алтая и Сибири, двуглавая гора с крупными ледниками.
+            Первое восхождение — 1914 год, братья Троновы.
+          </p>
+          <details class="mountain-card__details">
+            <summary class="mountain-card__summary">Подробнее</summary>
+            <div class="mountain-card__body">
+              <p>
+                Массив включает Восточную (4 506 м) и Западную (около 4 435 м) вершины.
+                Восхождение требует работы на леднике и уверенного владения
+                снаряжением для страховки.
+              </p>
+              <p>
+                Белуха входит в объект Всемирного наследия ЮНЕСКО «Золотые горы Алтая».
+                Основные опасности — трещины, лавины и резкая смена погоды.
+              </p>
+            </div>
+          </details>
+        </article>
+
+      </div>
+
+      <!-- Сообщение, если ничего не найдено -->
+      <p class="catalog__empty" id="catalog-empty">
+        По выбранным параметрам вершин не найдено. Попробуйте изменить фильтры.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       О ПРОЕКТЕ
+       ============================================================ -->
+  <section class="section about" id="about">
+    <div class="container">
+      <h2 class="section__title">О проекте</h2>
+      <p class="about__lead">
+        «Выше облаков» — некоммерческий справочник для тех, кто планирует восхождение
+        или просто интересуется альпинизмом. Мы собрали в одном месте базовые факты
+        о высочайших и самых известных вершинах планеты: высоту, регион, ранг сложности
+        маршрута, историю первовосхождений и ключевые события.
+      </p>
+      <p class="about__lead">
+        Материал носит ознакомительный характер и не заменяет подготовку под руководством
+        опытного гида, полноценную акклиматизацию и изучение актуальных условий на маршруте.
+      </p>
+
+      <ul class="stats">
+        <li class="stats__item">
+          <span class="stats__value">22</span>
+          <span class="stats__label">вершины в справочнике</span>
+        </li>
+        <li class="stats__item">
+          <span class="stats__value">4</span>
+          <span class="stats__label">континента: Азия, Европа, Америка, Африка</span>
+        </li>
+        <li class="stats__item">
+          <span class="stats__value">8 848 м</span>
+          <span class="stats__label">максимальная высота — Эверест</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================================================
+     ФУТЕР
+     ============================================================ -->
+<footer class="footer">
+  <div class="container footer__inner">
+
+    <div class="footer__top">
+      <span class="footer__brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Иконка горы">
+          <path d="M2 19h20L14.5 6 11 12l-2-3-7 10Z"/>
+          <path d="M12.4 9.6 14.5 6"/>
+        </svg>
+        Выше облаков
+      </span>
+
+      <nav class="footer__links" aria-label="Социальные сети">
+        <a class="footer__link" href="#" rel="noopener">Telegram</a>
+        <a class="footer__link" href="#" rel="noopener">YouTube</a>
+        <a class="footer__link" href="#" rel="noopener">Instagram</a>
+        <a class="footer__link" href="#" rel="noopener">VK</a>
+      </nav>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© 2025 «Выше облаков». Все права защищены.</p>
+      <p>Информация носит справочный характер и не является руководством к восхождению.</p>
+    </div>
+
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   ЛОГИКА СТРАНИЦЫ (vanilla JS, без библиотек)
+   ============================================================ */
+(function () {
+  'use strict';
+
+  /* ---------- 1. Мобильное меню («бургер») ---------- */
+  var burger = document.getElementById('burger');
+  var nav = document.getElementById('primary-nav');
+
+  function closeNav() {
+    if (!nav || !burger) return;
+    nav.classList.remove('is-open');
+    burger.classList.remove('is-active');
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', 'Открыть меню');
+  }
+
+  if (burger && nav) {
+    burger.addEventListener('click', function () {
+      var isOpen = nav.classList.toggle('is-open');
+      burger.classList.toggle('is-active', isOpen);
+      burger.setAttribute('aria-expanded', String(isOpen));
+      burger.setAttribute('aria-label', isOpen ? 'Закрыть меню' : 'Открыть меню');
+    });
+
+    /* Закрываем меню после клика по ссылке */
+    Array.prototype.forEach.call(nav.querySelectorAll('.nav__link'), function (link) {
+      link.addEventListener('click', closeNav);
+    });
+
+    /* Закрытие по Escape */
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeNav();
+    });
+
+    /* Закрытие по клику вне панели */
+    document.addEventListener('click', function (event) {
+      if (!nav.classList.contains('is-open')) return;
+      if (!nav.contains(event.target) && !burger.contains(event.target)) closeNav();
+    });
+  }
+
+  /* ---------- 2. Фильтрация карточек ---------- */
+  var pillGroups = document.querySelectorAll('[data-filter-group]');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.mountain-card'));
+  var counter = document.getElementById('filter-count');
+  var emptyState = document.getElementById('catalog-empty');
+  var resetBtn = document.getElementById('reset-filters');
+
+  /* Текущее состояние фильтров */
+  var state = {
+    height: 'all',
+    difficulty: 'all',
+    region: 'all'
+  };
+
+  /* Проверка попадания высоты в выбранный диапазон */
+  function matchesHeight(height, range) {
+    if (range === 'low') return height < 5000;
+    if (range === 'mid') return height >= 5000 && height <= 7000;
+    if (range === 'high') return height > 7000;
+    return true;
+  }
+
+  /* Применение всех фильтров к карточкам */
+  function applyFilters() {
+    var visibleCount = 0;
+
+    cards.forEach(function (card) {
+      var height = parseInt(card.getAttribute('data-height'), 10);
+      var difficulty = card.getAttribute('data-difficulty');
+      var region = card.getAttribute('data-region');
+
+      var isMatch =
+        matchesHeight(height, state.height) &&
+        (state.difficulty === 'all' || difficulty === state.difficulty) &&
+        (state.region === 'all' || region === state.region);
+
+      card.hidden = !isMatch;
+      if (isMatch) visibleCount += 1;
+    });
+
+    if (counter) {
+      counter.textContent = 'Показано ' + visibleCount + ' из ' + cards.length;
+    }
+    if (emptyState) {
+      emptyState.classList.toggle('is-visible', visibleCount === 0);
+    }
+  }
+
+  /* Обработка кликов по «пилюлям» */
+  Array.prototype.forEach.call(pillGroups, function (group) {
+    var key = group.getAttribute('data-filter-group');
+    var pills = group.querySelectorAll('.pill');
+
+    Array.prototype.forEach.call(pills, function (pill) {
+      pill.addEventListener('click', function () {
+        Array.prototype.forEach.call(pills, function (item) {
+          item.classList.remove('is-active');
+          item.setAttribute('aria-pressed', 'false');
+        });
+
+        pill.classList.add('is-active');
+        pill.setAttribute('aria-pressed', 'true');
+
+        state[key] = pill.getAttribute('data-value');
+        applyFilters();
+      });
+    });
+  });
+
+  /* Сброс всех фильтров */
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function () {
+      Array.prototype.forEach.call(pillGroups, function (group) {
+        var key = group.getAttribute('data-filter-group');
+        var pills = group.querySelectorAll('.pill');
+
+        Array.prototype.forEach.call(pills, function (pill) {
+          var isDefault = pill.getAttribute('data-value') === 'all';
+          pill.classList.toggle('is-active', isDefault);
+          pill.setAttribute('aria-pressed', String(isDefault));
+        });
+
+        state[key] = 'all';
+      });
+
+      applyFilters();
+    });
+  }
+
+  /* Первичная отрисовка счётчика */
+  applyFilters();
+
+  /* ---------- 3. Лёгкий параллакс в hero ---------- */
+  var mountains = document.getElementById('hero-mountains');
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var ticking = false;
+
+  function updateParallax() {
+    ticking = false;
+    if (!mountains || prefersReducedMotion.matches) return;
+
+    var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    var limit = window.innerHeight * 1.2;
+
+    if (scrollY <= limit) {
+      mountains.style.transform = 'translate3d(0,' + (scrollY * 0.12).toFixed(2) + 'px,0)';
+    }
+  }
+
+  if (mountains && !prefersReducedMotion.matches) {
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(updateParallax);
+      }
+    }, { passive: true });
+  }
+
+  /* ---------- 4. Автосворачивание «Подробнее» при скролле ---------- */
+  if ('IntersectionObserver' in window) {
+    var detailsObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) {
+          var details = entry.target.querySelector('.mountain-card__details');
+          if (details && details.hasAttribute('open')) {
+            details.removeAttribute('open');
+          }
+        }
+      });
+    }, { threshold: 0 });
+
+    cards.forEach(function (card) {
+      detailsObserver.observe(card);
+    });
+  }
+
+})();
+</script>
+
+</body>
+</html>
