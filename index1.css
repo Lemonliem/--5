@@ -707,6 +707,191 @@ a{ color:inherit; }
 }
 
 /* ============================================================
+   9a. ГАЛЕРЕЯ ВЕРШИН (карусель)
+   ============================================================ */
+.carousel{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.6rem;
+  margin-top:2.4rem;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.carousel__viewport{
+  position:relative;
+  flex:1 1 0;
+  min-width:0;
+  overflow:hidden;
+  border-radius:var(--radius-lg);
+  touch-action:pan-y;
+}
+
+.carousel__track{
+  display:flex;
+  margin:0;
+  padding:0;
+  list-style:none;
+  will-change:transform;
+  transition:transform .55s cubic-bezier(.22,.61,.36,1);
+}
+
+.carousel__slide{
+  position:relative;
+  flex:0 0 100%;
+  padding:.4rem;
+  cursor:pointer;
+}
+@media (min-width:620px){ .carousel__slide{ flex-basis:50%; } }
+@media (min-width:960px){ .carousel__slide{ flex-basis:33.3333%; } }
+
+.carousel__media{
+  position:relative;
+  aspect-ratio:16/10;
+  overflow:hidden;
+  border-radius:var(--radius-md);
+  background:linear-gradient(135deg, var(--color-deep-2), #2c5488);
+  box-shadow:var(--shadow-sm);
+}
+.carousel__media img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .5s ease;
+}
+.carousel__slide:hover .carousel__media img,
+.carousel__slide:focus-visible .carousel__media img{ transform:scale(1.06); }
+
+.carousel__caption{
+  position:absolute;
+  left:.7rem;
+  right:.7rem;
+  bottom:.7rem;
+  z-index:1;
+  display:block;
+  width:fit-content;
+  max-width:calc(100% - 1.4rem);
+  padding:.4rem .85rem;
+  border-radius:var(--radius-pill);
+  background:rgba(11,30,63,.62);
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+  color:#fff;
+  font-size:.83rem;
+  font-weight:700;
+  line-height:1.3;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.carousel__nav{
+  z-index:2;
+  display:flex;
+  flex:0 0 auto;
+  align-items:center;
+  justify-content:center;
+  width:52px;
+  height:52px;
+  padding:0;
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:50%;
+  background:rgba(11,30,63,.85);
+  color:#fff;
+  box-shadow:var(--shadow-md);
+  cursor:pointer;
+  transition:background var(--transition), border-color var(--transition),
+             transform var(--transition), box-shadow var(--transition);
+}
+.carousel__nav:hover{
+  background:var(--color-deep);
+  border-color:var(--color-accent);
+  box-shadow:0 12px 28px rgba(11,30,63,.35);
+  transform:scale(1.06);
+}
+.carousel__nav:active{ transform:scale(.96); }
+.carousel__nav svg{ width:24px; height:24px; }
+
+.carousel__dots{
+  display:flex;
+  flex:1 1 100%;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:.45rem;
+  margin-top:1.1rem;
+  padding:0 .5rem;
+}
+.carousel__dot{
+  width:9px;
+  height:9px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:#c3d2e6;
+  cursor:pointer;
+  transition:background var(--transition), transform var(--transition);
+}
+.carousel__dot:hover{ background:#9fb3cf; }
+.carousel__dot.is-active{
+  background:var(--color-accent);
+  transform:scale(1.3);
+}
+
+/* Фокус слайда виден только с клавиатуры */
+.carousel__slide:focus-visible{
+  outline:3px solid var(--color-accent);
+  outline-offset:2px;
+  border-radius:var(--radius-md);
+}
+
+/* ============================================================
+   9b. ПЛАВАЮЩАЯ КНОПКА «К ГАЛЕРЕЕ»
+   ============================================================ */
+.to-gallery{
+  position:fixed;
+  right:1.25rem;
+  bottom:1.25rem;
+  z-index:70;
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  min-height:48px;
+  padding:.6rem 1.1rem .6rem .85rem;
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:var(--radius-pill);
+  background:rgba(11,30,63,.92);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  color:#fff;
+  font-size:.9rem;
+  font-weight:700;
+  line-height:1;
+  box-shadow:var(--shadow-lg);
+  cursor:pointer;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(.75rem);
+  transition:opacity var(--transition), transform var(--transition),
+             background var(--transition), border-color var(--transition),
+             visibility var(--transition);
+}
+.to-gallery svg{
+  width:20px;
+  height:20px;
+  color:var(--color-accent);
+}
+.to-gallery:hover{
+  background:var(--color-deep-2);
+  border-color:var(--color-accent);
+}
+.to-gallery.is-visible{
+  opacity:1;
+  visibility:visible;
+  transform:none;
+}
+
+/* ============================================================
    10. ДОСТУПНОСТЬ: УМЕНЬШЕННАЯ АНИМАЦИЯ
    ============================================================ */
 @media (prefers-reduced-motion:reduce){
