@@ -177,4 +177,95 @@
     });
   }
 
+  /* ---------- 5. Карусель «Лови момент» ---------- */
+  var carousel = document.getElementById('moment-carousel');
+
+  if (carousel) {
+    var track = document.getElementById('moment-track');
+    var slides = Array.prototype.slice.call(track.querySelectorAll('.carousel__slide'));
+    var dotsWrap = document.getElementById('moment-dots');
+    var counter = document.getElementById('moment-counter');
+    var prevBtn = carousel.querySelector('[data-action="prev"]');
+    var nextBtn = carousel.querySelector('[data-action="next"]');
+    var current = 0;
+    var timer = null;
+    var AUTOPLAY_MS = 5000;
+
+    function buildDots() {
+      slides.forEach(function (slide, i) {
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'carousel__dot';
+        dot.setAttribute('aria-label', 'Слайд ' + (i + 1) + ' из ' + slides.length);
+        dot.addEventListener('click', function () {
+          goTo(i);
+          restartAutoplay();
+        });
+        dotsWrap.appendChild(dot);
+      });
+    }
+
+    function update() {
+      track.style.transform = 'translateX(' + (-current * 100) + '%)';
+
+      Array.prototype.forEach.call(dotsWrap.children, function (dot, i) {
+        dot.classList.toggle('is-active', i === current);
+        dot.setAttribute('aria-current', i === current ? 'true' : 'false');
+      });
+
+      slides.forEach(function (slide, i) {
+        slide.classList.toggle('is-active', i === current);
+        slide.setAttribute('aria-hidden', i === current ? 'false' : 'true');
+      });
+
+      if (counter) counter.textContent = (current + 1) + ' / ' + slides.length;
+      if (prevBtn) prevBtn.disabled = current === 0;
+      if (nextBtn) nextBtn.disabled = current === slides.length - 1;
+    }
+
+    function goTo(index) {
+      current = (index + slides.length) % slides.length;
+      update();
+    }
+
+    function next() { goTo(current + 1); }
+    function prev() { goTo(current - 1); }
+
+    function startAutoplay() {
+      if (prefersReducedMotion.matches || slides.length < 2) return;
+      stopAutoplay();
+      timer = setInterval(next, AUTOPLAY_MS);
+    }
+
+    function stopAutoplay() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function restartAutoplay() { startAutoplay(); }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () { prev(); restartAutoplay(); });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () { next(); restartAutoplay(); });
+    }
+
+    carousel.addEventListener('mouseenter', stopAutoplay);
+    carousel.addEventListener('mouseleave', startAutoplay);
+    carousel.addEventListener('focusin', stopAutoplay);
+    carousel.addEventListener('focusout', startAutoplay);
+
+    carousel.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowLeft') { prev(); restartAutoplay(); }
+      if (event.key === 'ArrowRight') { next(); restartAutoplay(); }
+    });
+
+    buildDots();
+    update();
+    startAutoplay();
+  }
+
 })();

@@ -43,6 +43,7 @@
       <ul class="nav__list">
         <li><a class="nav__link" href="#catalog">Горы</a></li>
         <li><a class="nav__link" href="#filter">Фильтр</a></li>
+        <li><a class="nav__link" href="#moments">Лови момент</a></li>
         <li><a class="nav__link" href="#about">О проекте</a></li>
       </ul>
     </nav>
@@ -922,6 +923,110 @@
       <p class="catalog__empty" id="catalog-empty">
         По выбранным параметрам вершин не найдено. Попробуйте изменить фильтры.
       </p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ЛОВИ МОМЕНТ (карусель)
+       ============================================================ -->
+  <section class="section moments" id="moments">
+    <div class="container">
+      <h2 class="section__title">Лови момент</h2>
+      <p class="section__subtitle">
+        Пять мгновений с вершин из нашего каталога: люди и пейзажи там,
+        где воздух разрежен, а эмоции — на пределе.
+      </p>
+
+      <div class="carousel" id="moment-carousel"
+           aria-roledescription="карусель" aria-label="Фотографии с горных вершин">
+
+        <div class="carousel__stage">
+          <div class="carousel__viewport">
+            <ul class="carousel__track" id="moment-track" aria-live="off">
+
+              <li class="carousel__slide is-active" role="group" aria-roledescription="слайд" aria-label="1 из 5">
+                <figure class="moment">
+                  <img class="moment__img" src="Фото проекта/mount-everest.jpg"
+                       alt="Альпинистка с флагом на вершине Эвереста"
+                       width="1280" height="960" loading="lazy" decoding="async">
+                  <figcaption class="moment__caption">
+                    <span class="moment__peak">Эверест · 8 848 м</span>
+                    <span class="moment__place">Непал / Китай (Тибет)</span>
+                  </figcaption>
+                </figure>
+              </li>
+
+              <li class="carousel__slide" role="group" aria-roledescription="слайд" aria-label="2 из 5">
+                <figure class="moment">
+                  <img class="moment__img" src="Фото проекта/mount-elbrus.jpg"
+                       alt="Альпинист на вершине Эльбруса"
+                       width="1280" height="960" loading="lazy" decoding="async">
+                  <figcaption class="moment__caption">
+                    <span class="moment__peak">Эльбрус · 5 642 м</span>
+                    <span class="moment__place">Россия (Кавказ)</span>
+                  </figcaption>
+                </figure>
+              </li>
+
+              <li class="carousel__slide" role="group" aria-roledescription="слайд" aria-label="3 из 5">
+                <figure class="moment">
+                  <img class="moment__img" src="Фото проекта/kilimanjaro-uhuru-peak.jpg"
+                       alt="Альпинист у таблички на пике Ухуру, Килиманджаро"
+                       width="1280" height="854" loading="lazy" decoding="async">
+                  <figcaption class="moment__caption">
+                    <span class="moment__peak">Килиманджаро · 5 895 м</span>
+                    <span class="moment__place">Танзания (пик Ухуру)</span>
+                  </figcaption>
+                </figure>
+              </li>
+
+              <li class="carousel__slide" role="group" aria-roledescription="слайд" aria-label="4 из 5">
+                <figure class="moment">
+                  <img class="moment__img" src="Фото проекта/summit-matterhorn.jpg"
+                       alt="Альпинисты на вершине Маттерхорна"
+                       width="1280" height="960" loading="lazy" decoding="async">
+                  <figcaption class="moment__caption">
+                    <span class="moment__peak">Маттерхорн · 4 478 м</span>
+                    <span class="moment__place">Швейцария / Италия</span>
+                  </figcaption>
+                </figure>
+              </li>
+
+              <li class="carousel__slide" role="group" aria-roledescription="слайд" aria-label="5 из 5">
+                <figure class="moment">
+                  <img class="moment__img" src="Фото проекта/aconcagua-summit.jpg"
+                       alt="Альпинист на вершине Аконкагуа"
+                       width="1280" height="960" loading="lazy" decoding="async">
+                  <figcaption class="moment__caption">
+                    <span class="moment__peak">Аконкагуа · 6 961 м</span>
+                    <span class="moment__place">Аргентина</span>
+                  </figcaption>
+                </figure>
+              </li>
+
+            </ul>
+          </div>
+
+          <button class="carousel__arrow carousel__arrow--prev" type="button" data-action="prev" aria-label="Предыдущее фото">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <button class="carousel__arrow carousel__arrow--next" type="button" data-action="next" aria-label="Следующее фото">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 6l6 6-6 6"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="carousel__footer">
+          <p class="carousel__counter" id="moment-counter" role="status" aria-live="polite">1 / 5</p>
+          <div class="carousel__dots" id="moment-dots" role="tablist" aria-label="Выбор слайда"></div>
+        </div>
+
+      </div>
     </div>
   </section>
 

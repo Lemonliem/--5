@@ -719,3 +719,160 @@ a{ color:inherit; }
     transition-duration:.01ms !important;
   }
 }
+
+/* ============================================================
+   11. СЕКЦИЯ «ЛОВИ МОМЕНТ» (КАРУСЕЛЬ)
+   ============================================================ */
+.moments{
+  background:linear-gradient(180deg, #fff 0%, var(--color-ice) 100%);
+}
+
+.carousel{
+  margin-top:2.4rem;
+}
+
+.carousel__stage{
+  position:relative;
+}
+
+.carousel__viewport{
+  overflow:hidden;
+  border-radius:var(--radius-lg);
+  background:var(--color-deep-2);
+  box-shadow:var(--shadow-lg);
+}
+
+.carousel__track{
+  display:flex;
+  transition:transform .55s cubic-bezier(.4, 0, .2, 1);
+  will-change:transform;
+}
+
+.carousel__slide{
+  flex:0 0 100%;
+  min-width:0;
+}
+
+.moment{
+  position:relative;
+  margin:0;
+}
+
+.moment__img{
+  display:block;
+  width:100%;
+  aspect-ratio:16/10;
+  object-fit:cover;
+}
+
+.moment__caption{
+  position:absolute;
+  inset:auto 0 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:.15rem;
+  padding:2.4rem 1.5rem 1.15rem;
+  background:linear-gradient(180deg, rgba(11,30,63,0) 0%, rgba(11,30,63,.85) 100%);
+  color:#fff;
+  pointer-events:none;
+}
+
+.moment__peak{
+  font-size:clamp(1.05rem, 2.4vw, 1.3rem);
+  font-weight:800;
+  letter-spacing:-.01em;
+}
+
+.moment__place{
+  font-size:.92rem;
+  color:rgba(255,255,255,.85);
+}
+
+/* Стрелки навигации */
+.carousel__arrow{
+  position:absolute;
+  top:50%;
+  z-index:5;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  padding:0;
+  border:1px solid rgba(255,255,255,.4);
+  border-radius:50%;
+  background:rgba(11,30,63,.55);
+  color:#fff;
+  cursor:pointer;
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+  transition:background var(--transition),
+             border-color var(--transition),
+             transform var(--transition),
+             opacity var(--transition);
+}
+.carousel__arrow--prev{ left:1rem; transform:translateY(-50%); }
+.carousel__arrow--next{ right:1rem; transform:translateY(-50%); }
+.carousel__arrow:hover{
+  background:var(--color-accent);
+  border-color:var(--color-accent);
+}
+.carousel__arrow--prev:hover{ transform:translateY(-50%) scale(1.08); }
+.carousel__arrow--next:hover{ transform:translateY(-50%) scale(1.08); }
+.carousel__arrow svg{
+  width:22px;
+  height:22px;
+}
+.carousel__arrow[disabled]{
+  opacity:.4;
+  cursor:default;
+  pointer-events:none;
+}
+
+/* Футер: счётчик и точки */
+.carousel__footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  margin-top:1.1rem;
+}
+
+.carousel__counter{
+  font-weight:700;
+  color:var(--color-deep);
+  font-variant-numeric:tabular-nums;
+}
+
+.carousel__dots{
+  display:flex;
+  gap:.5rem;
+}
+
+.carousel__dot{
+  width:11px;
+  height:11px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:#b9c9de;
+  cursor:pointer;
+  transition:background var(--transition), transform var(--transition);
+}
+.carousel__dot:hover{
+  background:var(--color-accent-soft);
+  transform:scale(1.2);
+}
+.carousel__dot.is-active{
+  background:var(--color-accent);
+  transform:scale(1.25);
+}
+
+@media (max-width:560px){
+  .carousel__arrow{
+    width:40px;
+    height:40px;
+  }
+  .carousel__arrow--prev{ left:.6rem; }
+  .carousel__arrow--next{ right:.6rem; }
+}
